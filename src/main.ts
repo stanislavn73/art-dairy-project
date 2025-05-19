@@ -66,12 +66,8 @@ const handleInteractions = (
     const currentPos = new OpenSeadragon.Point(event.clientX, event.clientY);
     const distance = startMousePosition!.distanceTo(currentPos);
 
-    // Mark as dragging if movement exceeds a threshold (e.g., 5px)
-    if (distance > 3) {
-      isDragging = true;
-    } else {
-      isDragging = false;
-    }
+    // Mark as dragging if movement exceeds a threshold (e.g., 3px)
+    isDragging = distance > 3;
 
     if (isDragging && startMousePosition) {
       // Get the current mouse position
@@ -170,6 +166,7 @@ const main = () => {
   viewer.addHandler('open', () => {
     (Array.from(allZones.children) as SVGGeometryElement[]).forEach(
       (element) => {
+        element.style.opacity = '0';
         handleInteractions(viewer, element);
       },
     );

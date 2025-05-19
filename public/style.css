@@ -159,10 +159,8 @@ button:hover {
 
 #custom-svg-overlay g,
 #custom-svg-overlay path {
-    opacity: 1;
     transition: opacity 0.2s;
     cursor: pointer;
-    fill: black; /* or rgba(0,0,0,0) */
     pointer-events: auto;
 }
 
