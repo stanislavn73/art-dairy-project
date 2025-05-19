@@ -15,10 +15,6 @@
     "vite": "^5.2.0"
   },
   "dependencies": {
-    "@tensorflow-models/deeplab": "^0.2.2",
-    "@tensorflow/tfjs": "^4.22.0",
-    "@tensorflow/tfjs-backend-webgl": "^4.22.0",
-    "@tensorflow/tfjs-converter": "^4.22.0",
     "openseadragon": "^5.0.1"
   }
 }
