@@ -9,62 +9,88 @@ const initializeViewer = (): OpenSeadragon.Viewer => {
     visibilityRatio: 1,
     minZoomLevel: 1,
     defaultZoomLevel: 1,
-    homeFillsViewer: true, // Ensures the image fits within the viewer
+    homeFillsViewer: true,
   });
 };
 
-// Function to get bounding box of an SVG element in image coordinates
-const getImageBBox = (
-  element: SVGGraphicsElement,
-): { x: number; y: number; width: number; height: number } => {
-  const bbox = element.getBBox();
-  return { x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height };
-};
-
-// Attach interactivity to individual SVG zones
-const attachZoneInteractivity = (
-  allZones: HTMLElement,
+const handleInteractions = (
   viewer: OpenSeadragon.Viewer,
+  element: Element, // The clickable SVG element
 ) => {
-  Array.from(allZones.children).forEach((child) => {
-    const element = child as SVGGraphicsElement;
+  let isDragging = false;
+  let clickStart: number;
+  let startMousePosition: OpenSeadragon.Point | null = null;
 
-    element.setAttribute('fill', 'black');
-    element.setAttribute('pointer-events', 'auto');
-    element.style.pointerEvents = 'auto';
-    element.style.cursor = 'pointer';
+  element.addEventListener('mousedown', (event: MouseEvent) => {
+    isDragging = false; // Reset dragging state
+    clickStart = Date.now();
+    startMousePosition = new OpenSeadragon.Point(event.clientX, event.clientY);
+  });
 
-    if (!(element as any)._osdClickAttached) {
-      // Add click listener only once
-      (element as any)._osdClickAttached = true;
+  document.addEventListener('mousemove', (event: MouseEvent) => {
+    if (!clickStart) return;
 
-      element.addEventListener('click', (event) => {
-        event.stopPropagation();
+    const currentPos = new OpenSeadragon.Point(event.clientX, event.clientY);
+    const distance = startMousePosition.distanceTo(currentPos);
 
-        // Get bounding box in image coordinates
-        const bbox = getImageBBox(element);
-
-        // Translate bbox to viewer coordinates
-        const viewportRect = viewer.viewport.imageToViewportRectangle(
-          bbox.x,
-          bbox.y,
-          bbox.width,
-          bbox.height,
-        );
-
-        // Smoothly zoom to the selected SVG zone
-        viewer.viewport.fitBounds(viewportRect, true);
-      });
+    // Mark as dragging if movement exceeds a threshold (e.g., 5px)
+    if (distance > 3) {
+      isDragging = true;
+    } else {
+      isDragging = false;
     }
+
+    if (isDragging && startMousePosition) {
+      // Get the current mouse position
+      const currentMousePosition = new OpenSeadragon.Point(
+        event.clientX,
+        event.clientY,
+      );
+
+      // Calculate the delta between the last position and the current position
+      const deltaX = currentMousePosition.x - startMousePosition.x;
+      const deltaY = currentMousePosition.y - startMousePosition.y;
+
+      // Use OpenSeadragon to pan the image
+      viewer.viewport.panBy(
+        viewer.viewport.deltaPointsFromPixels(
+          new OpenSeadragon.Point(-deltaX, -deltaY),
+        ),
+      );
+
+      // Update the last mouse position
+      startMousePosition = currentMousePosition;
+
+      // Prevent default behavior to avoid accidental text selection
+      event.preventDefault();
+    }
+  });
+
+  document.addEventListener('mouseup', (event: MouseEvent) => {
+    const clickDuration = Date.now() - clickStart;
+    const isClick = !isDragging && clickDuration < 200; // Allow quick clicks under 200ms
+
+    if (isClick && !isDragging) {
+      // Trigger zoom behavior
+      const bbox = (event.target as SVGGraphicsElement).getBBox();
+      const viewportRect = viewer.viewport.imageToViewportRectangle(
+        bbox.x,
+        bbox.y,
+        bbox.width,
+        bbox.height,
+      );
+      viewer.viewport.fitBounds(viewportRect, true); // Smooth zoom
+    }
+
+    // Reset interaction state
+    isDragging = false;
+    clickStart = 0;
+    startMousePosition = null;
   });
 };
 
 // Function to update the SVG overlay's position and scale
-const updateOverlay = (
-  viewer: OpenSeadragon.Viewer,
-  svg: SVGSVGElement,
-  allZones: HTMLElement,
-) => {
+const updateOverlay = (viewer: OpenSeadragon.Viewer, svg: SVGSVGElement) => {
   const tiledImage = viewer.world.getItemAt(0);
   const imageWidth = tiledImage.getContentSize().x;
   const imageHeight = tiledImage.getContentSize().y;
@@ -86,9 +112,6 @@ const updateOverlay = (
     'transform',
     `translate(${topLeft.x},${topLeft.y}) scale(${scaleX},${scaleY})`,
   );
-
-  // Attach interactivity to zones
-  attachZoneInteractivity(allZones, viewer);
 };
 
 const main = () => {
@@ -106,11 +129,16 @@ const main = () => {
   }
 
   // Update overlay whenever viewer updates occur
-  const runUpdateOverlay = () => updateOverlay(viewer, svg, allZones);
+  const runUpdateOverlay = () => updateOverlay(viewer, svg);
 
   viewer.addHandler('animation', runUpdateOverlay); // For smooth zooming and panning
   viewer.addHandler('resize', runUpdateOverlay); // For Responsive Resize
   viewer.addHandler('open', runUpdateOverlay); // When viewer initializes
+  viewer.addHandler('open', () => {
+    Array.from(allZones.children).forEach((element) => {
+      handleInteractions(viewer, element);
+    });
+  });
 
   console.log('OpenSeadragon viewer initialized.');
 };
