@@ -13,9 +13,32 @@ const initializeViewer = (): OpenSeadragon.Viewer => {
   });
 };
 
+const detectPointerInside = (element: SVGGeometryElement) => {
+  // Function to check if the mouse is inside an element
+  return (event: MouseEvent) => {
+    const point = element.ownerSVGElement?.createSVGPoint();
+    if (!point) return false;
+
+    // Set the mouse coordinates to the SVG point
+    point.x = event.clientX;
+    point.y = event.clientY;
+
+    // Convert screen coordinates to the SVG's coordinate system
+    const transformedPoint = point.matrixTransform(
+      element.getScreenCTM()?.inverse(),
+    );
+
+    // Check if the mouse is inside the SVG element
+    return (
+      element.isPointInFill?.(transformedPoint) ||
+      element.isPointInStroke?.(transformedPoint)
+    );
+  };
+};
+
 const handleInteractions = (
   viewer: OpenSeadragon.Viewer,
-  element: Element, // The clickable SVG element
+  element: SVGGeometryElement, // The clickable SVG element
 ) => {
   let isDragging = false;
   let clickStart: number;
@@ -28,10 +51,20 @@ const handleInteractions = (
   });
 
   document.addEventListener('mousemove', (event: MouseEvent) => {
+    const isInside = detectPointerInside(element)(event);
+
+    if (isInside) {
+      // Highlight or interact with the element if the pointer is inside
+      element.style.opacity = '1';
+    } else {
+      // Reset opacity if the pointer is outside
+      element.style.opacity = '0';
+    }
+
     if (!clickStart) return;
 
     const currentPos = new OpenSeadragon.Point(event.clientX, event.clientY);
-    const distance = startMousePosition.distanceTo(currentPos);
+    const distance = startMousePosition!.distanceTo(currentPos);
 
     // Mark as dragging if movement exceeds a threshold (e.g., 5px)
     if (distance > 3) {
@@ -135,12 +168,12 @@ const main = () => {
   viewer.addHandler('resize', runUpdateOverlay); // For Responsive Resize
   viewer.addHandler('open', runUpdateOverlay); // When viewer initializes
   viewer.addHandler('open', () => {
-    Array.from(allZones.children).forEach((element) => {
-      handleInteractions(viewer, element);
-    });
+    (Array.from(allZones.children) as SVGGeometryElement[]).forEach(
+      (element) => {
+        handleInteractions(viewer, element);
+      },
+    );
   });
-
-  console.log('OpenSeadragon viewer initialized.');
 };
 
 document.addEventListener('DOMContentLoaded', main);
