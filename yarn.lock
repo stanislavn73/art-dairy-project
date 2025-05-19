@@ -324,6 +324,11 @@
   resolved "https://registry.yarnpkg.com/@types/offscreencanvas/-/offscreencanvas-2019.7.3.tgz#90267db13f64d6e9ccb5ae3eac92786a7c77a516"
   integrity sha512-ieXiYmgSRXUDeOntE1InxjWyvEelZGP63M+cGuquuRLuIKKT1osnkXjxev9B7d1nXSug5vpunx+gNlbVxMlC9A==
 
+"@types/openseadragon@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@types/openseadragon/-/openseadragon-4.1.0.tgz#61e3d64d4a2bbcf3265f60516315225239004d49"
+  integrity sha512-GLWtnT2QY0+VfoqP8Y2U7aOUoCH6ncFnZ7QbqohFLBKkujCvk3UamlJZlvlKajm2VstlxgeC7yfB9vY6M5n9PA==
+
 "@types/seedrandom@^2.4.28":
   version "2.4.34"
   resolved "https://registry.yarnpkg.com/@types/seedrandom/-/seedrandom-2.4.34.tgz#c725cd0fc0442e2d3d0e5913af005686ffb7eb99"
@@ -603,6 +608,11 @@ node-fetch@~2.6.1:
   integrity sha512-StxNAxh15zr77QvvkmveSQ8uCQ4+v5FkvNTj0OESmiHu+VRi/gXArXtkWMElOsOUNLtUEvI4yS+rdtOHZTwlQA==
   dependencies:
     whatwg-url "^5.0.0"
+
+openseadragon@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/openseadragon/-/openseadragon-5.0.1.tgz#ad3aaccc6c0f733c3153131e9af05bc2e17a1952"
+  integrity sha512-a/hjouW9i3UfWxRADVYN2MyRhXMGnE7x9VVL7/4jXCcDLFyO4UM5o4RStYtqa5BfaHw/wMNAaD2WbxQF8f1pJg==
 
 picocolors@^1.1.1:
   version "1.1.1"

@@ -40,10 +40,6 @@ h1 {
     margin-bottom: 40px;
 }
 
-#app {
-    max-width: 1280px;
-}
-
 .logo {
     margin-top: 45px;
     margin-left: 20%;
@@ -64,6 +60,8 @@ img {
     justify-content: center;
     padding: 60px;
     color: rgba(255, 255, 255, 1);
+    width:90vw;
+    height:90vh;
 }
 
 .counter-interaction {
@@ -122,6 +120,7 @@ button:hover {
     max-width: fit-content;
 }
 
+
 .animalsImage{
     width:50%;
 }
@@ -157,3 +156,13 @@ button:hover {
         margin-bottom: 15px;
     }
 }
+
+#custom-svg-overlay g,
+#custom-svg-overlay path {
+    opacity: 1;
+    transition: opacity 0.2s;
+    cursor: pointer;
+    fill: black; /* or rgba(0,0,0,0) */
+    pointer-events: auto;
+}
+

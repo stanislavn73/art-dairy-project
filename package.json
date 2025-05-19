@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/openseadragon": "^4.1.0",
     "prettier": "^3.3.1",
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
@@ -17,6 +18,7 @@
     "@tensorflow-models/deeplab": "^0.2.2",
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-backend-webgl": "^4.22.0",
-    "@tensorflow/tfjs-converter": "^4.22.0"
+    "@tensorflow/tfjs-converter": "^4.22.0",
+    "openseadragon": "^5.0.1"
   }
 }
